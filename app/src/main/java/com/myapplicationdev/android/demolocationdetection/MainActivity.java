@@ -9,6 +9,7 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -37,10 +38,10 @@ public class MainActivity extends AppCompatActivity {
         btn3 = findViewById(R.id.btnRemoveLocationUpdate);
         client = LocationServices.getFusedLocationProviderClient(this);
 
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        mLocationRequest.setInterval(10000);
-        mLocationRequest.setFastestInterval(5000);
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(1000);
+        mLocationRequest.setFastestInterval(500);
         mLocationRequest.setSmallestDisplacement(100);
 
         mLocationCallback = new LocationCallback() {
@@ -51,10 +52,11 @@ public class MainActivity extends AppCompatActivity {
                     double lat= data.getLatitude();
                     double lng= data.getLongitude();
                     String msg = "Lat : " + lat + " Lng : " + lng;
-                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
                 }
-            };
+            }
         };
+
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,8 +104,12 @@ public class MainActivity extends AppCompatActivity {
 
         if (permissionCheck_Coarse == PermissionChecker.PERMISSION_GRANTED
                 || permissionCheck_Fine == PermissionChecker.PERMISSION_GRANTED) {
+            Log.d("permissions", "yes");
             return true;
         } else {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
             return false;
         }
     }
